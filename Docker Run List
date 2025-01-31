@@ -1,0 +1,159 @@
+git clone –depth 1 https://github.com/sickcodes/Docker-OSX
+
+MAC_ADDRESS: 
+MODEL: 
+BOARD_SERIAL: 
+UUID: 
+SERIAL: 
+
+
+docker cp bluebubbles-setup:/home/arch/OSX-KVM/OpenCore
+
+docker run -it \
+    --privileged -i \
+    --device /dev/kvm \
+    -p 50922:10022 \
+    -e XDG_RUNTIME_DIR=/tmp \
+    -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
+    -e QT_QPA_PLATFORM=wayland \
+    -e GDK_BACKEND=wayland \
+    -e CLUTTER_BACKEND=wayland \
+    -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -e "DISPLAY=${DISPLAY:-:0.0}" \
+    -e AUDIO_DRIVER=pa,server=unix:/tmp/pulseaudio.socket \
+    -v "/run/user/$(id -u)/pulse/native:/tmp/pulseaudio.socket" \
+    -e GENERATE_UNIQUE=true \
+    -e CPU='Haswell-noTSX' \
+    -e CPUID_FLAGS='kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on' \
+    -e MASTER_PLIST_URL='https://github.com/Mythses/Docker-OSX-Config/blob/main/config-sonoma.plist’ \
+    sickcodes/docker-osx:sonoma
+
+# docker build -t docker-osx --build-arg SHORTNAME=sonoma .
+
+
+docker run \
+    --privileged -i \
+    --device /dev/kvm \
+    -p 50922:10022 \
+    -e XDG_RUNTIME_DIR=/tmp \
+    -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
+    -e QT_QPA_PLATFORM=wayland \
+    -e GDK_BACKEND=wayland \
+    -e CLUTTER_BACKEND=wayland \
+    -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -e "DISPLAY=${DISPLAY:-:0.0}" \
+    -e AUDIO_DRIVER=pa,server=unix:/tmp/pulseaudio.socket \
+    -v "/run/user/$(id -u)/pulse/native:/tmp/pulseaudio.socket" \
+    sickcodes/docker-osx:high-sierra
+
+
+docker run -it \
+    --device /dev/kvm \
+    -p 50922:10022 \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -e "DISPLAY=${DISPLAY:-:0.0}" \
+    sickcodes/docker-osx:high-sierra
+
+# docker build -t docker-osx --build-arg SHORTNAME=high-sierra .
+
+docker run \
+  --privileged -i \
+  --rm \
+  --name bluebubbles \
+  --dns=1.1.1.1 \
+  --device /dev/kvm \
+  -p 5999:5999 \
+  -p 1234:1234 \
+  -p 50922:10022 \
+  -e XDG_RUNTIME_DIR=/tmp \
+  -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
+  -e QT_QPA_PLATFORM=wayland \
+  -e GDK_BACKEND=wayland \
+  -e CLUTTER_BACKEND=wayland \
+  -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v /home/lewis/maindisk.qcow2:/image \
+  -v /home/lewis/bootdisk.qcow2:/bootdisk \
+  -e IMAGE_PATH="/image" \
+  -e BOOTDISK="/bootdisk" \
+  -e EXTRA="-display none -vnc 0.0.0.0:99,password-secret=secvnc0 -object secret,id=secvnc0,data=vncpass" \
+  -e ADDITIONAL_PORTS="hostfwd=tcp::1234-:1234," \
+  -e DISPLAY=:99 \
+  -e WIDTH=1920 \
+  -e HEIGHT=1080 \
+  -e NOPICKER=true \
+  sickcodes/docker-osx:naked
+
+docker run \
+  --privileged -i \
+  --rm \
+  --name bluebubblessetup \
+  --dns=1.1.1.1 \
+  --device /dev/kvm \
+  -p 5999:5999 \
+  -e XDG_RUNTIME_DIR=/tmp \
+  -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
+  -e QT_QPA_PLATFORM=wayland \
+  -e GDK_BACKEND=wayland \
+  -e CLUTTER_BACKEND=wayland \
+  -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
+  -v $PWD/maindisk.qcow2:/image \
+  -v $PWD/bootdisk.qcow2:/bootdisk \
+  -e IMAGE_PATH="/image" \
+  -e BOOTDISK="/bootdisk" \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v $PWD/maindisk.qcow2:/image \
+  -e IMAGE_PATH="/image" \
+  -e DISPLAY=:99 \
+  -e AUDIO_DRIVER=pa,server=unix:/tmp/pulseaudio.socket \
+  -v "/run/user/$(id -u)/pulse/native:/tmp/pulseaudio.socket" \
+  -e WIDTH=1920 \
+  -e HEIGHT=1080 \
+   -e CPU='Haswell-noTSX' \
+   -e CPUID_FLAGS='kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on' \
+   -e MASTER_PLIST_URL='https://github.com/Mythses/Docker-OSX-Config/blob/main/config-sonoma.plist' \
+    sickcodes/docker-osx:naked
+
+docker run   --privileged -i   --rm   --name bluebubblessetup   --dns=1.1.1.1   --device /dev/kvm   -p 5999:5999   -e XDG_RUNTIME_DIR=/tmp   -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY   -e QT_QPA_PLATFORM=wayland   -e GDK_BACKEND=wayland   -e CLUTTER_BACKEND=wayland   -v $XDG_RUNTIME_DIR/$WAYLAND_DISPL
+AY:/tmp/$WAYLAND_DISPLAY   -v $PWD/maindisk.qcow2:/image   -v $PWD/bootdisk.qcow2:/bootdisk   -e IMAGE_PATH="/image"   -e BOOTDISK="/bootdisk"   -v /tmp/.X11-unix:/tmp/.X11-unix   -v $PWD/maindisk.qcow2:/image   -e IMAGE_PATH="/image"   -e DISPLAY=:99   -e AUDIO_DRIVER=pa,server=unix:/tmp/pulseaudio.socket   -v "/r
+un/user/$(id -u)/pulse/native:/tmp/pulseaudio.socket"   -e WIDTH=1920   -e HEIGHT=1080    -e MASTER_PLIST_URL='https://github.com/Mythses/Docker-OSX-Config/blob/main/config-sonoma.plist'     -e CPU='Haswell-noTSX'     -e CPUID_FLAGS='kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on'     sickcodes/docker-osx:
+naked
+
+
+docker run -it \
+    --device /dev/kvm --device /dev/snd \
+    -p 50922:10022 \
+    -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
+    -e WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}" -e DISPLAY=":1" \
+    -e GENERATE_UNIQUE=true -e QT_QPA_PLATFORM=wayland \
+    -e XDG_RUNTIME_DIR=/tmp -e GDK_BACKEND=wayland \
+    -e CLUTTER_BACKEND=wayland \
+    -e MASTER_PLIST_URL='https://raw.githubusercontent.com/sickcodes/osx-serial-generator/master/config-custom.plist' \
+    --security-opt label=type:container_runtime_t \
+    sickcodes/docker-osx:sonoma
+
+docker run \
+  --rm \
+  --name bluebubbles \
+  --dns=1.1.1.1 \
+  --device /dev/kvm \
+    -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
+    -e QT_QPA_PLATFORM=wayland \
+    -e GDK_BACKEND=wayland \
+    -e CLUTTER_BACKEND=wayland \
+    -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v $PWD/maindisk.qcow2:/image \
+  -v $PWD/bootdisk.qcow2:/bootdisk \
+  -e IMAGE_PATH="/image" \
+  -e BOOTDISK="/bootdisk" \
+  -e EXTRA="-display none -vnc 0.0.0.0:99,password-secret=secvnc0 -object secret,id=secvnc0,data=vncpass" \
+  -e ADDITIONAL_PORTS="hostfwd=tcp::1234-:1234," \
+  -e DISPLAY=:99 \
+  -e WIDTH=1920 \
+  -e HEIGHT=1080 \
+  -e NOPICKER=true \
+  sickcodes/docker-osx:naked
+
